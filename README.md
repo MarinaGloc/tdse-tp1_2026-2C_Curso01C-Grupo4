@@ -4,4 +4,4 @@
 ### Responsable de la entrega:
 | Padrón | Apellidos, Nombres | Fecha | Deadline |
 | :----- | :--------------------- | :------: | :-------: |
-| XXXXXX | YYYY, ZZZ | | Semana 04 |
+| 111698 | Gloc, Marina Loreley | 11/09/2026 | Semana 04 |

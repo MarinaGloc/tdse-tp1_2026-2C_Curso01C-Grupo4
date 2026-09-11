@@ -6,7 +6,7 @@ El módulo **System** es el núcleo del firmware. Implementa la Máquina de Esta
 
 ---
 ### Estados (`systemState_t`)
-* `ST_IDLE`: Estado de reposo. El sistema espera a que un vehículo se pida sobre la bobina de entrada.
+* `ST_IDLE`: Estado de reposo. El sistema espera a que un vehículo se estacione sobre la bobina de entrada.
 * `ST_WAIT_CAM_PANEL`: Espera a que la cámara registre y valide la patente del vehículo detectado.
 * `ST_WAIT_BTN_PRESS`: Espera a que el usuario presione el botón para solicitar su ticket.
 * `ST_PRINT_TICKET`: Simula el tiempo de impresión/emisión del ticket.
@@ -69,18 +69,16 @@ El módulo **System** es el núcleo del firmware. Implementa la Máquina de Esta
 
 | Estado Actual | Evento / Signal Recibido | Condición [Guardia] | Estado Siguiente | Acciones Realizadas / Comandos a `Actuator` |
 | :--- | :--- | :--- | :--- | :--- |
-| `ST_IDLE` | `EV_SYS_CAR_ARRIVED` | - | `ST_WAIT_CAM_PANEL` | `ACT_CMD_CAM_CAPTURE`, `DEL_TIMEOUT = 10000ms` |
-| `ST_WAIT_CAM_PANEL` | `EV_SYS_CAM_VALIDATED` | - | `ST_WAIT_BTN_PRESS` | `ACT_CMD_SERVER_LOG_PATENT`, `DEL_TIMEOUT = 15000ms` |
-| `ST_WAIT_CAM_PANEL` | `tick` | `[DEL_TIMEOUT == 0]` | `ST_IDLE` | `ACT_CMD_RESET_ALL` |
-| `ST_WAIT_CAM_PANEL` | `EV_SYS_CAR_LEFT_IN` | - | `ST_IDLE` | `ACT_CMD_RESET_ALL` |
-| `ST_WAIT_BTN_PRESS` | `EV_SYS_BTN_DOWN` | - | `ST_PRINT_TICKET` | `ACT_CMD_PRINT_START`, `DEL_PRINT = 2000ms` |
-| `ST_WAIT_BTN_PRESS` | `tick` | `[DEL_TIMEOUT == 0]` | `ST_IDLE` | `ACT_CMD_RESET_ALL` |
-| `ST_WAIT_BTN_PRESS` | `EV_SYS_CAR_LEFT_IN` | - | `ST_IDLE` | `ACT_CMD_RESET_ALL` |
-| `ST_PRINT_TICKET` | `tick` | `[DEL_PRINT == 0]` | `ST_OPENING_BARRIER` | `ACT_CMD_BARRIER_OPEN_FAST`, `DEL_BARRIER = 3000ms` |
-| `ST_OPENING_BARRIER` | `tick` | `[DEL_BARRIER == 0]` | `ST_WAIT_CAR_PASS` | `ACT_CMD_BARRIER_KEEP_OPEN`, `DEL_TIMEOUT = 20000ms` |
-| `ST_WAIT_CAR_PASS` | `EV_SYS_CAR_PASSED` | - | `ST_CLOSING_BARRIER` | `ACT_CMD_BARRIER_CLOSE_SLOW`, `DEL_BARRIER = 5000ms` |
-| `ST_WAIT_CAR_PASS` | `tick` | `[DEL_TIMEOUT == 0]` | `ST_CLOSING_BARRIER` | `ACT_CMD_BARRIER_CLOSE_SLOW`, `DEL_BARRIER = 5000ms` |
-| `ST_CLOSING_BARRIER` | `tick` | `[DEL_BARRIER == 0]` | `ST_IDLE` | `ACT_CMD_BARRIER_LOWERED`, `ACT_CMD_RESET_ALL` |
-
-
-//AGREGAR CUANDO NO SE CUMPLE
+| `ST_IDLE` | `EV_SYS_CAR_ARRIVED` | - | `ST_WAIT_CAM_PANEL` | `ACT_CMD_CAM_CAPTURE`, `tick=DEL_TIMEOUT_10s` | //(establecimos de manera arbitraria una espera de 10s, con fines prudenciales para la práctica)
+| `ST_WAIT_CAM_PANEL` | `EV_SYS_CAM_VALIDATED` | - | `ST_WAIT_BTN_PRESS` | `ACT_CMD_SERVER_LOG_PATENT`, `tick=DEL_TIMEOUT_15s` |
+| `ST_WAIT_CAM_PANEL` | - | `[tick == 0]` | `ST_IDLE` | `tick=ACT_CMD_RESET_ALL` | //caso de perturbaciones externas
+| `ST_WAIT_CAM_PANEL` | `EV_SYS_CAR_LEFT_IN` | - | `ST_IDLE` | `tick=ACT_CMD_RESET_ALL` |
+| `ST_WAIT_BTN_PRESS` | `EV_SYS_BTN_DOWN` | - | `ST_PRINT_TICKET` | `ACT_CMD_PRINT_START`, `tick=DEL_PRINT_2s` |
+| `ST_WAIT_BTN_PRESS` | - | `[tick == 0]` | `ST_IDLE` | `tick=ACT_CMD_RESET_ALL` |
+| `ST_WAIT_BTN_PRESS` | `EV_SYS_CAR_LEFT_IN` | - | `ST_IDLE` | `tick=ACT_CMD_RESET_ALL` |
+| `ST_PRINT_TICKET` | - | `[tick == 0]` | `ST_OPENING_BARRIER` | `tick=ACT_CMD_BARRIER_OPEN_FAST`, `frecuency_up= DEL_BARRIER_5Hz` |
+| `ST_OPENING_BARRIER` | - | `[frecuency_up == true]` | `ST_WAIT_CAR_PASS` | `ACT_CMD_BARRIER_KEEP_OPEN`, `tick= DEL_TIMEOUT_20s` |
+| `ST_OPENED_BARRIER` | - | `[LED_ON == true]` | `ST_WAIT_CAR_PASS` | `ACT_CMD_BARRIER_KEEP_OPEN`, `tick= DEL_TIMEOUT_20s` |
+| `ST_WAIT_CAR_PASS` | `EV_SYS_CAR_PASSED` | - | `ST_CLOSING_BARRIER` | `ACT_CMD_BARRIER_CLOSE_SLOW`, `frecuency_down= DEL_BARRIER_1Hz` |
+| `ST_WAIT_CAR_PASS` | - | `[frecuency_down == true]` | `ST_CLOSING_BARRIER` | `ACT_CMD_BARRIER_CLOSE_SLOW`, `tick= DEL_TIMEOUT_20s`|
+| `ST_CLOSING_BARRIER` | - | `[tick == 0]` | `ST_IDLE` | `ACT_CMD_RESET_ALL` |

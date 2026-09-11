@@ -17,8 +17,6 @@ El módulo **Sensor** es el encargado de sensar el estado de los periféricos de
 * **Eventos de Hardware (Triggers de Entrada/Tiempo):**
   * `EV_INPUT_HIGH`: La entrada digital pasa a nivel alto ($3.3\text{V}$).
   * `EV_INPUT_LOW`: La entrada digital pasa a nivel bajo ($0\text{V}$).
-  * `tick`: Evento periódico del sistema cada $1\text{ms}$ utilizado para decrementar los contadores de temporización (`DEL_SENSOR_NAME`).
-
 * **Acciones y Signals (Notificaciones a la capa `System`):**
   * `EV_SYS_BTN_DOWN`: Signal emitida cuando se confirma la pulsación estable del botón de ticket.
   * `EV_SYS_BTN_UP`: Signal emitida cuando se confirma la liberación del botón de ticket.
@@ -32,6 +30,7 @@ El módulo **Sensor** es el encargado de sensar el estado de los periféricos de
 ## 2. Diagrama de Transición de Estados (Sensor FSM)
 
 Cada entrada digital independiente ejecuta la siguiente máquina de estados genérica para garantizar que las señales recibidas por la capa `System` estén completamente libres de rebotes o falsos disparos.
+El sensor principal estudiado es: **Ticket Button** para el cual utilizamos un Pulsador:
 
 ```mermaid
 stateDiagram-v2
@@ -43,37 +42,39 @@ stateDiagram-v2
 
     ST_BTN_UP ::: idle --> ST_BTN_FALLING ::: transient : EV_INPUT_LOW / DEL = DEBOUNCE_TIME
     
-    ST_BTN_FALLING --> ST_BTN_UP : EV_INPUT_HIGH
-    ST_BTN_FALLING --> ST_BTN_FALLING : EV_INPUT_LOW
-    ST_BTN_FALLING --> ST_BTN_DOWN ::: active : tick [DEL == 0] / raise EV_SYS_xxx_DOWN
+    ST_BTN_FALLING --> ST_BTN_UP : EV_BTN_UP
+    ST_BTN_FALLING --> ST_BTN_FALLING : EV_BTN_DOWN
+    ST_BTN_FALLING --> ST_BTN_DOWN ::: active : tick [DEL == 0] / raise EV_SYS_BTN_DOWN
 
     ST_BTN_DOWN --> ST_BTN_RISING ::: transient : EV_INPUT_HIGH / DEL = DEBOUNCE_TIME
 
-    ST_BTN_RISING --> ST_BTN_DOWN : EV_INPUT_LOW
-    ST_BTN_RISING --> ST_BTN_RISING : EV_INPUT_HIGH
-    ST_BTN_RISING --> ST_BTN_UP : tick [DEL == 0] / raise EV_SYS_xxx_UP
+    ST_BTN_RISING --> ST_BTN_DOWN : EV_BTN_DOWN
+    ST_BTN_RISING --> ST_BTN_RISING : EV_BTN_UP
+    ST_BTN_RISING --> ST_BTN_UP : tick [DEL == 0] / raise EV_SYS_BTN_UP
 ```
 
 ## Tabla de Transición de Estados del Módulo Sensor (STT)
 
-### 1. Botón de Solicitud de Ticket (`BTN_TICKET`)
+### 1. Botón de Solicitud de Ticket (`BTN_TICKET`) -> SOLUCIÓN PASO 7
 
 | Estado Actual | Evento / Entrada | Condición [Guardia] | Estado Siguiente | Acciones Realizadas |
 | :--- | :--- | :--- | :--- | :--- |
-| `ST_BTN_UP` | `EV_BTN_DOWN` | - | `ST_BTN_FALLING` | `DEL_BTN = 50ms` |
+| `ST_BTN_UP` | `EV_BTN_DOWN` | - | `ST_BTN_FALLING` | `tick=DEL_BTN_50ms` |
 | `ST_BTN_UP` | `EV_BTN_UP` | - | - | - |
-| `ST_BTN_FALLING` | `tick` | `[DEL_BTN > 0]` | `ST_BTN_FALLING` | `DEL_BTN--` |
-| `ST_BTN_FALLING` | `tick` | `[DEL_BTN == 0]` | `ST_BTN_DOWN` | `raise EV_SYS_BTN_DOWN` |
-| `ST_BTN_FALLING` | `EV_BTN_UP` | - | `ST_BTN_UP` | - |
-| `ST_BTN_DOWN` | `EV_BTN_UP` | - | `ST_BTN_RISING` | `DEL_BTN = 50ms` |
+| `ST_BTN_FALLING` | - | `[tick > 0]` | - | `tick--` |
+| `ST_BTN_FALLING` | `EV_BTN_UP` | `[tick == 0]` | `ST_BTN_UP` | - |
+| `ST_BTN_FALLING` | `EV_BTN_DOWN` | `[tick == 0]` | `ST_BTN_DOWN` | `raise EV_SYS_BTN_DOWN` |
+| `ST_BTN_DOWN` | `EV_BTN_UP` | - | `ST_BTN_RISING` | `tick=DEL_BTN_50ms` |
 | `ST_BTN_DOWN` | `EV_BTN_DOWN` | - | - | - |
-| `ST_BTN_RISING` | `tick` | `[DEL_BTN > 0]` | `ST_BTN_RISING` | `DEL_BTN--` |
-| `ST_BTN_RISING` | `tick` | `[DEL_BTN == 0]` | `ST_BTN_UP` | `raise EV_SYS_BTN_UP` |
-| `ST_BTN_RISING` | `EV_BTN_DOWN` | - | `ST_BTN_DOWN` | - |
+| `ST_BTN_RISING` | - | `[tick > 0]` | - | `tick--` |
+| `ST_BTN_RISING` | `EV_BTN_UP` | `[tick == 0]` | `ST_BTN_UP` | `raise EV_SYS_BTN_UP` |
+| `ST_BTN_RISING` | `EV_BTN_DOWN` | `[tick == 0]` | `ST_BTN_DOWN` | - |
 
 ---
 
-### 2. Bobina de Entrada / Presencia Vehicular (`SEN_COIL_IN`)
+También realizamos un análisis de los demás sensores:
+
+### 2. Bobina de Entrada y Salida/ Presencia Vehicular (`SEN_COIL_IN/OUT`)
 
 | Estado Actual | Evento / Entrada | Condición [Guardia] | Estado Siguiente | Acciones Realizadas |
 | :--- | :--- | :--- | :--- | :--- |
@@ -102,18 +103,3 @@ stateDiagram-v2
 | `ST_CAM_FALLING` | `EV_CAM_HIGH` | - | `ST_CAM_ACTIVE` | - |
 
 ---
-
-### 4. Bobina de Barrera / Paso de Salida (`SEN_COIL_OUT`)
-
-| Estado Actual | Evento / Entrada | Condición [Guardia] | Estado Siguiente | Acciones Realizadas |
-| :--- | :--- | :--- | :--- | :--- |
-| `ST_COIL_OUT_OFF` | `EV_COIL_OUT_HIGH` | - | `ST_COIL_OUT_RISING` | `DEL_COIL_OUT = DEBOUNCE_TIME` |
-| `ST_COIL_OUT_RISING` | `tick` | `[DEL_COIL_OUT > 0]` | `ST_COIL_OUT_RISING` | `DEL_COIL_OUT--` |
-| `ST_COIL_OUT_RISING` | `tick` | `[DEL_COIL_OUT == 0]` | `ST_COIL_OUT_ON` | `raise EV_SYS_CAR_ON_BARRIER` |
-| `ST_COIL_OUT_RISING` | `EV_COIL_OUT_LOW` | - | `ST_COIL_OUT_OFF` | - |
-| `ST_COIL_OUT_ON` | `EV_COIL_OUT_LOW` | - | `ST_COIL_OUT_FALLING` | `DEL_COIL_OUT = DEBOUNCE_TIME` |
-| `ST_COIL_OUT_FALLING` | `tick` | `[DEL_COIL_OUT > 0]` | `ST_COIL_OUT_FALLING` | `DEL_COIL_OUT--` |
-| `ST_COIL_OUT_FALLING` | `tick` | `[DEL_COIL_OUT == 0]` | `ST_COIL_OUT_OFF` | `raise EV_SYS_CAR_PASSED` |
-| `ST_COIL_OUT_FALLING` | `EV_COIL_OUT_HIGH` | - | `ST_COIL_OUT_ON` | - |
-
-//PONER LAS BOBINAS DE ENTRADA/SALIDA EN UNA SOLA??

@@ -40,7 +40,7 @@ Garantiza la independencia del hardware mediante máquinas de estado locales que
 ---
 ## 4. Diagrama de Transición de Estados (Sensor FSM)
 
-ACT_CMD_BARRIER_OPEN_FAST 
+CAMBIAR POR MERMAID 
                                   (HALF_PERIOD = 100ms) / 
                                   ACT_CMD_BARRIER_CLOSE_SLOW 
                                   (HALF_PERIOD = 500ms)
@@ -71,7 +71,7 @@ ACT_CMD_BARRIER_OPEN_FAST
 
 | Estado Actual | Evento / Comando Recibido | Condición [Guardia] | Estado Siguiente | Acciones Realizadas |
 | :--- | :--- | :--- | :--- | :--- |
-| `ST_ACT_OFF` | `ACT_CMD_BARRIER_OPEN_FAST` | - | `ST_ACT_BLINK_ON` | `OUT_LED_BARRIER = HIGH`, `DEL_BLINK_BARRIER = 100ms` |
+| `ST_PRINT_OFF` | `ACT_CMD_BARRIER_OPEN_FAST` | - | `ST_ACT_BLINK_ON` | `OUT_LED_BARRIER = HIGH`, `DEL_BLINK_BARRIER = 100ms` |
 | `ST_ACT_BLINK_ON` | `tick` | `[DEL_BLINK_BARRIER > 0]` | `ST_ACT_BLINK_ON` | `DEL_BLINK_BARRIER--` |
 | `ST_ACT_BLINK_ON` | `tick` | `[DEL_BLINK_BARRIER == 0]` | `ST_ACT_BLINK_OFF` | `OUT_LED_BARRIER = LOW`, `DEL_BLINK_BARRIER = HALF_PERIOD` |
 | `ST_ACT_BLINK_OFF` | `tick` | `[DEL_BLINK_BARRIER > 0]` | `ST_ACT_BLINK_OFF` | `DEL_BLINK_BARRIER--` |
