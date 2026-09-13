@@ -20,7 +20,7 @@ En el acceso al estacionamiento se encuentra una cámara que lee la patente del 
   * **Cámara de captura / ANPR:** Lectura automática de patentes de vehículos.
   * **Lazo inductivo (Bobina sensor):** Detección inductiva de presencia de vehículo.
   * **Barrera:** Control físico de paso.
-* **Estación de pago:** Terminales de cobro automático o manual. // TAMBIEN CONSULTAR ESTO
+* **Estación de pago:** Terminales de cobro automático o manual.
 * **Carril de salida:** Módulo lector de tickets validados y control de salida.
 
 ---
@@ -33,13 +33,11 @@ En el acceso al estacionamiento se encuentra una cámara que lee la patente del 
 5. **Habilitación de Paso:** El PTDM envía la orden a la barrera vehicular para su apertura.
 6. **Paso y Cierre:** El vehículo atraviesa la barrera, el sensor de salida confirma que la zona quedó liberada y la barrera procede al cierre automático.
 
-CONSULTAR SI AGREGAMOS LA TARJETA AL SISTEMA,  y display de numero de vacantes.-
-
 ---
 
 ## Arquitectura de Software Temporizada (Update by Time, period = 1ms)
 El programa está organizado en módulos independientes que se ejecutan de forma cíclica cada **1 ms**:
-//CAMBIAR CON MERMAID
+
 ``` text
 ┌──────────────────┐      ┌──────────────────┐      ┌──────────────────┐
 │      SENSOR      │───>  │      SYSTEM      │───>  │     ACTUATOR     │
