@@ -81,7 +81,7 @@ CAMBIAR POR MERMAID
 | `ST_ACT_ON` | `ACT_CMD_BARRIER_CLOSE_SLOW` | - | `ST_ACT_BLINK_ON` | `OUT_LED_BARRIER = HIGH`, `tick=DEL_BLINK_BARRIER_5s` |
 | `Cualquiera` | `ACT_CMD_BARRIER_LOWERED` / `RESET` | - | `ST_ACT_OFF` | `OUT_LED_BARRIER = LOW` |
 
-> **Nota:** Para `ACT_CMD_BARRIER_OPEN_FAST` el medio período `HALF_PERIOD` es de $1000\text{ms}$ ($5\text{Hz}$), mientras que para `ACT_CMD_BARRIER_CLOSE_SLOW` es de $5000\text{ms}$ ($1\text{Hz}$).
+> **Nota:** Para `ACT_CMD_BARRIER_OPEN_FAST` el medio período `HALF_PERIOD` es de $10\text{s}$ ($5\text{Hz}$), mientras que para `ACT_CMD_BARRIER_CLOSE_SLOW` es de $5\text{s}$ ($1\text{Hz}$).
 
 ---
 
