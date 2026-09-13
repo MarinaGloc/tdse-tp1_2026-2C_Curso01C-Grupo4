@@ -1,0 +1,19 @@
+@EventDriven
+@SuperSteps(no)
+
+interface:
+    // Eventos de entrada (Comandos y Reloj de 1 ms)
+    in event ACT_CMD_BARRIER_OPEN_FAST
+    in event ACT_CMD_BARRIER_KEEP_OPEN
+    in event ACT_CMD_BARRIER_KEEP_CLOSE
+    in event ACT_CMD_BARRIER_LOWERED
+    in event ACT_CMD_RESET_ALL
+    in event tick
+
+    // Variable de control de tiempo y salida digital
+    var OUT_LED_BARRIER : boolean = false
+    var tick_val : integer = 0
+
+    // Constantes de temporización
+    const DEL_BLINK_BARRIER_10s : integer = 10000
+    const DEL_BLINK_BARRIER_1s : integer = 1000

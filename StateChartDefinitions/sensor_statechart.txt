@@ -1,0 +1,15 @@
+@EventDriven
+@SuperSteps(no)
+
+interface:
+    // Eventos de entrada
+    in event EV_BTN_DOWN
+    in event EV_BTN_UP
+
+    // Signals o eventos de salida hacia la capa System
+    out event EV_SYS_BTN_DOWN
+    out event EV_SYS_BTN_UP
+
+    // Variable temporizadora de debouncing (en ms)
+    var DEL_BTN_50ms : integer = 50000
+    var tick : integer = 0

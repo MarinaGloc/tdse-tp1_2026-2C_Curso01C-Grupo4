@@ -1,0 +1,30 @@
+@EventDriven
+@SuperSteps(no)
+
+interface:
+    // Eventos de entrada desde la capa Sensor
+    in event EV_SYS_CAR_ARRIVED
+    in event EV_SYS_CAM_VALIDATED
+    in event EV_SYS_BTN_DOWN
+    in event EV_SYS_CAR_PASSED
+
+    // Salidas / Comandos hacia la capa Actuator
+    out event ACT_CMD_CAM_CAPTURE
+    out event ACT_CMD_SERVER_LOG_PATENT
+    out event ACT_CMD_PRINT_START
+    out event ACT_CMD_BARRIER_OPEN_FAST
+    out event ACT_CMD_BARRIER_KEEP_OPEN
+    out event ACT_CMD_BARRIER_CLOSE_SLOW
+    out event ACT_CMD_BARRIER_LOWERED
+    out event ACT_CMD_RESET_ALL
+
+    // Temporizador principal de decremento cíclico (1ms)
+    var tick: integer = 0
+
+    // Constantes de tiempo (en ms / ticks)
+    const DEL_TIMEOUT_10s: integer = 10000
+    const DEL_TIMEOUT_15s: integer = 15000
+    const DEL_TIMEOUT_20s: integer = 20000
+    const DEL_PRINT_2s: integer = 2000
+    const DEL_BARRIER_3s: integer = 3000
+    const DEL_BARRIER_5s: integer = 5000
