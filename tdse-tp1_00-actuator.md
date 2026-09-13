@@ -20,12 +20,13 @@ Garantiza la independencia del hardware mediante máquinas de estado locales que
 
 ### Comandos Recibidos de `System` (`actuatorCmd_t`)
 * `ACT_CMD_PRINT_START`: Enciende el indicador de impresión.
-* `ACT_CMD_BARRIER_OPEN_FAST`: Inicia parpadeo rápido ($5\text{Hz}$, $T = 200\text{ms}$) para indicar barrera subiendo.
+* `ACT_CMD_BARRIER_OPEN_FAST`: Inicia parpadeo rápido ($5\text{Hz}$, $T = 2\text{s}$) para indicar barrera subiendo.
 * `ACT_CMD_BARRIER_KEEP_OPEN`: Enciende en forma continua el LED de barrera (barrera levantada).
-* `ACT_CMD_BARRIER_CLOSE_SLOW`: Inicia parpadeo lento ($1\text{Hz}$, $T = 1000\text{ms}$) para indicar barrera bajando.
+* `ACT_CMD_BARRIER_CLOSE_SLOW`: Inicia parpadeo lento ($1\text{Hz}$, $T = 10\text{s}$) para indicar barrera bajando.
 * `ACT_CMD_BARRIER_LOWERED`: Apaga el LED de la barrera (barrera completamente cerrada).
-* `ACT_CMD_SERVER_LOG_PATENT`: Genera un destello corto ($100\text{ms}$) para indicar envío de datos de patente al servidor.
+* `ACT_CMD_SERVER_LOG_PATENT`: Genera un destello corto ($10\text{s}$) para indicar envío de datos de patente al servidor.
 * `ACT_CMD_RESET_ALL`: Fuerza el apagado de todas las salidas y resetea las FSM de la capa Actuator.
+* `ACT_CMD_BARRIER_KEEP_CLOSE`: Apaga en forma continua el LED de barrera (barrera baja).
 
 ### Estados Internos de Parpadeo (`actuatorState_t`)
 * `ST_ACT_OFF`: Salida forzada a nivel bajo ($0\text{V}$).
@@ -72,14 +73,16 @@ CAMBIAR POR MERMAID
 
 | Estado Actual | Evento / Comando Recibido | Condición [Guardia] | Estado Siguiente | Acciones Realizadas |
 | :--- | :--- | :--- | :--- | :--- |
-| `ST_ACT_OFF` | `ACT_CMD_BARRIER_OPEN_FAST` | - | `ST_ACT_BLINK_ON` | `OUT_LED_BARRIER = HIGH`, `tick=DEL_BLINK_BARRIER_10s` |
-| `ST_ACT_BLINK_ON` | `tick` | `[tick > 0]` | `ST_ACT_BLINK_ON` | `tick--` |
-| `ST_ACT_BLINK_ON` | `tick` | `[tick == 0]` | `ST_ACT_BLINK_OFF` | `OUT_LED_BARRIER = LOW`, `tick=DEL_BLINK_BARRIER_HALF_PERIOD` |
-| `ST_ACT_BLINK_OFF` | `tick` | `[tick > 0]` | `ST_ACT_BLINK_OFF` | `tick--` |
-| `ST_ACT_BLINK_OFF` | `tick` | `[tick == 0]` | `ST_ACT_BLINK_ON` | `OUT_LED_BARRIER = HIGH`, `tick=DEL_BLINK_BARRIER_HALF_PERIOD` |
-| `ST_ACT_BLINK_ON` / `OFF` | `ACT_CMD_BARRIER_KEEP_OPEN` | - | `ST_ACT_ON` | `OUT_LED_BARRIER = HIGH` |
+| `ST_ACT_OFF` | `ACT_CMD_BARRIER_OPEN_FAST` | - | `ST_ACT_ON` | `OUT_LED_BARRIER = HIGH`, `tick=DEL_BLINK_BARRIER_10s` |
+| `ST_ACT_ON` | `tick` | `[tick > 0]` | `ST_ACT_ON` | `tick--` |
+| `ST_ACT_ON` | `tick` | `[tick == 0]` | `ST_ACT_OFF` | `OUT_LED_BARRIER = LOW`, `tick=DEL_BLINK_BARRIER_HALF_PERIOD` |
+| `ST_ACT_OFF` | `tick` | `[tick > 0]` | `ST_ACT_OFF` | `tick--` |
+| `ST_ACT_OFF` | `tick` | `[tick == 0]` | `ST_ACT_ON` | `OUT_LED_BARRIER = HIGH`, `tick=DEL_BLINK_BARRIER_HALF_PERIOD` |
+| `ST_ACT_ON` | `ACT_CMD_BARRIER_KEEP_OPEN` | - | `ST_ACT_ON` | `OUT_LED_BARRIER = HIGH` |
+| `ST_ACT_OFF` | `ACT_CMD_BARRIER_KEEP_CLOSE` | - | `ST_ACT_BLINK_OFF` | `OUT_LED_BARRIER = LOW` |
 | `ST_ACT_ON` | `ACT_CMD_BARRIER_CLOSE_SLOW` | - | `ST_ACT_BLINK_ON` | `OUT_LED_BARRIER = HIGH`, `tick=DEL_BLINK_BARRIER_5s` |
-| `Cualquiera` | `ACT_CMD_BARRIER_LOWERED` / `RESET` | - | `ST_ACT_OFF` | `OUT_LED_BARRIER = LOW` |
+| `ST_ACT_BLINK_ON` | `ACT_CMD_BARRIER_KEEP_OPEN` | - | `ST_ACT_ON` | `ACT_CMD_RESET_ALL` |
+| `ST_ACT_BLINK_OFF` | `ACT_CMD_BARRIER_LOWERED` | - | `ST_ACT_OFF` | `ACT_CMD_RESET_ALL` |
 
 > **Nota:** Para `ACT_CMD_BARRIER_OPEN_FAST` el medio período `HALF_PERIOD` es de $10\text{s}$ ($5\text{Hz}$), mientras que para `ACT_CMD_BARRIER_CLOSE_SLOW` es de $5\text{s}$ ($1\text{Hz}$).
 
@@ -97,5 +100,6 @@ CAMBIAR POR MERMAID
 | Estado Actual | Evento / Comando | Condición [Guardia] | Estado Siguiente | Acciones Realizadas |
 | :--- | :--- | :--- | :--- | :--- |
 | `ST_ACT_OFF` | `ACT_CMD_SERVER_LOG_PATENT` | - | `ST_ACT_ON` | `OUT_LED_SERVER = HIGH`, `tick=DEL_COMM_PULSE_10s` |
+| `ST_ACT_OFF` | - | - | `ST_ACT_OFF` | `ACT_CMD_RESET_ALL` |
 | `ST_ACT_ON` | `tick` | `[tick > 0]` | `ST_ACT_ON` | `tick--` |
 | `ST_ACT_ON` | `tick` | `[tick == 0]` | `ST_ACT_OFF` | `OUT_LED_SERVER = LOW` |
