@@ -71,16 +71,16 @@ CAMBIAR POR MERMAID
 
 | Estado Actual | Evento / Comando Recibido | Condición [Guardia] | Estado Siguiente | Acciones Realizadas |
 | :--- | :--- | :--- | :--- | :--- |
-| `ST_PRINT_OFF` | `ACT_CMD_BARRIER_OPEN_FAST` | - | `ST_ACT_BLINK_ON` | `OUT_LED_BARRIER = HIGH`, `DEL_BLINK_BARRIER = 100ms` |
-| `ST_ACT_BLINK_ON` | `tick` | `[DEL_BLINK_BARRIER > 0]` | `ST_ACT_BLINK_ON` | `DEL_BLINK_BARRIER--` |
-| `ST_ACT_BLINK_ON` | `tick` | `[DEL_BLINK_BARRIER == 0]` | `ST_ACT_BLINK_OFF` | `OUT_LED_BARRIER = LOW`, `DEL_BLINK_BARRIER = HALF_PERIOD` |
-| `ST_ACT_BLINK_OFF` | `tick` | `[DEL_BLINK_BARRIER > 0]` | `ST_ACT_BLINK_OFF` | `DEL_BLINK_BARRIER--` |
-| `ST_ACT_BLINK_OFF` | `tick` | `[DEL_BLINK_BARRIER == 0]` | `ST_ACT_BLINK_ON` | `OUT_LED_BARRIER = HIGH`, `DEL_BLINK_BARRIER = HALF_PERIOD` |
+| `ST_ACT_OFF` | `ACT_CMD_BARRIER_OPEN_FAST` | - | `ST_ACT_BLINK_ON` | `OUT_LED_BARRIER = HIGH`, `tick=DEL_BLINK_BARRIER_10s` |
+| `ST_ACT_BLINK_ON` | `tick` | `[tick > 0]` | `ST_ACT_BLINK_ON` | `tick--` |
+| `ST_ACT_BLINK_ON` | `tick` | `[tick == 0]` | `ST_ACT_BLINK_OFF` | `OUT_LED_BARRIER = LOW`, `tick=DEL_BLINK_BARRIER_HALF_PERIOD` |
+| `ST_ACT_BLINK_OFF` | `tick` | `[tick > 0]` | `ST_ACT_BLINK_OFF` | `tick--` |
+| `ST_ACT_BLINK_OFF` | `tick` | `[tick == 0]` | `ST_ACT_BLINK_ON` | `OUT_LED_BARRIER = HIGH`, `tick=DEL_BLINK_BARRIER_HALF_PERIOD` |
 | `ST_ACT_BLINK_ON` / `OFF` | `ACT_CMD_BARRIER_KEEP_OPEN` | - | `ST_ACT_ON` | `OUT_LED_BARRIER = HIGH` |
-| `ST_ACT_ON` | `ACT_CMD_BARRIER_CLOSE_SLOW` | - | `ST_ACT_BLINK_ON` | `OUT_LED_BARRIER = HIGH`, `DEL_BLINK_BARRIER = 500ms` |
+| `ST_ACT_ON` | `ACT_CMD_BARRIER_CLOSE_SLOW` | - | `ST_ACT_BLINK_ON` | `OUT_LED_BARRIER = HIGH`, `tick=DEL_BLINK_BARRIER_5s` |
 | `Cualquiera` | `ACT_CMD_BARRIER_LOWERED` / `RESET` | - | `ST_ACT_OFF` | `OUT_LED_BARRIER = LOW` |
 
-> **Nota:** Para `ACT_CMD_BARRIER_OPEN_FAST` el medio período `HALF_PERIOD` es de $100\text{ms}$ ($5\text{Hz}$), mientras que para `ACT_CMD_BARRIER_CLOSE_SLOW` es de $500\text{ms}$ ($1\text{Hz}$).
+> **Nota:** Para `ACT_CMD_BARRIER_OPEN_FAST` el medio período `HALF_PERIOD` es de $1000\text{ms}$ ($5\text{Hz}$), mientras que para `ACT_CMD_BARRIER_CLOSE_SLOW` es de $5000\text{ms}$ ($1\text{Hz}$).
 
 ---
 
@@ -95,6 +95,6 @@ CAMBIAR POR MERMAID
 ### 6.2. Indicador de Comunicación Servidor (`OUT_LED_SERVER`)
 | Estado Actual | Evento / Comando | Condición [Guardia] | Estado Siguiente | Acciones Realizadas |
 | :--- | :--- | :--- | :--- | :--- |
-| `ST_ACT_OFF` | `ACT_CMD_SERVER_LOG_PATENT` | - | `ST_ACT_ON` | `OUT_LED_SERVER = HIGH`, `DEL_COMM_PULSE = 100ms` |
-| `ST_ACT_ON` | `tick` | `[DEL_COMM_PULSE > 0]` | `ST_ACT_ON` | `DEL_COMM_PULSE--` |
-| `ST_ACT_ON` | `tick` | `[DEL_COMM_PULSE == 0]` | `ST_ACT_OFF` | `OUT_LED_SERVER = LOW` |
+| `ST_ACT_OFF` | `ACT_CMD_SERVER_LOG_PATENT` | - | `ST_ACT_ON` | `OUT_LED_SERVER = HIGH`, `tick=DEL_COMM_PULSE_10s` |
+| `ST_ACT_ON` | `tick` | `[tick > 0]` | `ST_ACT_ON` | `tick--` |
+| `ST_ACT_ON` | `tick` | `[tick == 0]` | `ST_ACT_OFF` | `OUT_LED_SERVER = LOW` |
