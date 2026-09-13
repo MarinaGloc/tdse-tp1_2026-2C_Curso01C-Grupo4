@@ -3,8 +3,15 @@
 ## Descripción General de la Solución Comercial
 El sistema gestiona el control de acceso, cobro y nivel de ocupación de una playa de estacionamiento mediante arquitectura cliente-servidor.
 
-**DETALLAR LOS 3 COMPONENTES, QUE HACE CADA COMPONENTE Y COMO SE CONECTAN**
+1. **Intelligent Parking Management System:**
+El sistema integra diversos métodos tanto para la entrada y salida para vehículos, como sistema basado en tickets y/o tarjetas, reconocimiento automático de matrículas(ANPR), identificación mediante radiofrecuencia de largo alcance(RFID) y un par de sensores junto con barreras de acceso.
+A su vez, el sistema presenta un servidor donde se centraliza la gestión de estacionamiento para los pagos tanto en tarjeta como en efectivo.
 
+2.  **Automated Parking System:**
+Al ingresar el vehículo la máquina imprime automáticamente un ticket, permitiendo el acceso sin necesidad de personal. El usuario antes de retirarse escanea su ticket en un cajero automático para realizar la transacción. Luego, al escanear en la terminal de salida su ticket, la barrera se levanta para permitir la partida del vehículo. Dicho sistema permite reducir el costo operativo y el error humano durante el flujo vehicular. Además, consta de un monitoreo remoto para supervisar el estado de aparcamiento en tiempo real.
+
+3.   **- Parking Ticket Dispenser Machine (Entry):**
+En el acceso al estacionamiento se encuentra una cámara que lee la patente del vehículo y verifica en el servidor la categoría del usuario.  Si se trata de un conductor temporal, el sistema imprime un ticket con código QR o de barras luego de presionar el botón. Mientras que si fuera un usuario mensual la máquina tiene integrado un lector que abre la barrera de forma automática una vez que se acerca la tarjeta mensual.
 
 ### Componentes Principales:
 * **Servidor Central (Parking System Server):** Base de datos unificada para validar tarifas, ingresos, egresos, abonados y registros de patentes.
