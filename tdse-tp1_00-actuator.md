@@ -75,14 +75,16 @@ CAMBIAR POR MERMAID
 | :--- | :--- | :--- | :--- | :--- |
 | `ST_ACT_OFF` | `ACT_CMD_BARRIER_OPEN_FAST` | - | `ST_ACT_ON` | `OUT_LED_BARRIER = HIGH`, `tick=DEL_BLINK_BARRIER_10s` |
 | `ST_ACT_ON` | `tick` | `[tick > 0]` | `ST_ACT_ON` | `tick--` |
-| `ST_ACT_ON` | `tick` | `[tick == 0]` | `ST_ACT_OFF` | `OUT_LED_BARRIER = LOW`, `tick=DEL_BLINK_BARRIER_HALF_PERIOD` |
+| `ST_ACT_ON` | `tick` | `[tick == 0]` | `ST_ACT_OFF` | `OUT_LED_BARRIER = LOW`, `tick=DEL_BLINK_BARRIER_1s` |
 | `ST_ACT_OFF` | `tick` | `[tick > 0]` | `ST_ACT_OFF` | `tick--` |
-| `ST_ACT_OFF` | `tick` | `[tick == 0]` | `ST_ACT_ON` | `OUT_LED_BARRIER = HIGH`, `tick=DEL_BLINK_BARRIER_HALF_PERIOD` |
+| `ST_ACT_OFF` | `tick` | `[tick == 0]` | `ST_ACT_ON` | `OUT_LED_BARRIER = HIGH`, `tick=DEL_BLINK_BARRIER_10s` |
 | `ST_ACT_ON` | `ACT_CMD_BARRIER_KEEP_OPEN` | - | `ST_ACT_ON` | `OUT_LED_BARRIER = HIGH` |
-| `ST_ACT_OFF` | `ACT_CMD_BARRIER_KEEP_CLOSE` | - | `ST_ACT_BLINK_OFF` | `OUT_LED_BARRIER = LOW` |
-| `ST_ACT_ON` | `ACT_CMD_BARRIER_CLOSE_SLOW` | - | `ST_ACT_BLINK_ON` | `OUT_LED_BARRIER = HIGH`, `tick=DEL_BLINK_BARRIER_5s` |
-| `ST_ACT_BLINK_ON` | `ACT_CMD_BARRIER_KEEP_OPEN` | - | `ST_ACT_ON` | `ACT_CMD_RESET_ALL` |
-| `ST_ACT_BLINK_OFF` | `ACT_CMD_BARRIER_LOWERED` | - | `ST_ACT_OFF` | `ACT_CMD_RESET_ALL` |
+| `ST_ACT_OFF` | `ACT_CMD_BARRIER_KEEP_CLOSE` | - | `ST_ACT_OFF` | `OUT_LED_BARRIER = LOW` |
+| `ST_ACT_ON` | `ACT_CMD_BARRIER_KEEP_OPEN` | - | `ST_ACT_ON` | `OUT_LED_BARRIER = HIGH` |
+| `ST_ACT_BLINK_ON` | `ACT_CMD_BARRIER_OPEN_FAST` | - | `ST_ACT_ON` | - |
+| `ST_ACT_BLINK_OFF` | `ACT_CMD_BARRIER_LOWERED` | - | `ST_ACT_OFF` | - |
+| `ST_ACT_BLINK_ON` | - | - | `ST_ACT_OFF` | `ACT_CMD_RESET_ALL` |
+| `ST_ACT_BLINK_OFF` | - | - | `ST_ACT_ON` | `ACT_CMD_BARRIER_KEEP_OPEN` |
 
 > **Nota:** Para `ACT_CMD_BARRIER_OPEN_FAST` el medio período `HALF_PERIOD` es de $10\text{s}$ ($5\text{Hz}$), mientras que para `ACT_CMD_BARRIER_CLOSE_SLOW` es de $5\text{s}$ ($1\text{Hz}$).
 
