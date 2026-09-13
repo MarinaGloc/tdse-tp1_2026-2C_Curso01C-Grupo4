@@ -11,11 +11,10 @@
 
 ```text
 .
-├── actuator_statechart/        # Proyecto / Modelo Itemis CREATE para la FSM de Actuadores
+├── actuator_statechart/        # Proyecto / Modelo Itemis CREATE para la Barrera (Actuador)
 ├── my_first_statechart/         # Proyecto / Modelo inicial de pruebas Itemis CREATE
-├── sensor_statechart/           # Proyecto / Modelo Itemis CREATE para la FSM de Sensores
-├── StateChartDefinitions/       # Definiciones globales y tipos compartidos para las FSM
-├── system_statechart/           # Proyecto / Modelo Itemis CREATE para la FSM del Sistema Principal
+├── sensor_statechart/           # Proyecto / Modelo Itemis CREATE para el boton del ticket (Sensor)
+├── system_statechart/           # Proyecto / Modelo Itemis CREATE para el Sistema Principal
 ├── README.md                    # Documentación principal e índice del repositorio
 ├── tdse-tp1_00-actuator.md      # Especificación, STT y documentación de la capa Actuator
 ├── tdse-tp1_00-problem_approach.md # Planteo general del problema y requerimientos del sistema
