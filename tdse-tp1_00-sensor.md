@@ -25,6 +25,10 @@ El módulo **Sensor** es el encargado de sensar el estado de los periféricos de
   * `EV_SYS_CAR_PASSED`: Signal emitida cuando la bobina de barrera confirma que el vehículo atravesó el paso y la zona quedó libre.
   * `DEL_SENSOR_NAME = DEBOUNCE_TIME`: Carga del temporizador de filtrado de rebotes (ej. $20\text{ms}$).
 
+### Temporizadores del Sistema
+* `DEL_BTN_50ms`: Tiempo límite de espera para validación del botón (50ms).
+* `tick`: Evento de reloj del sistema (1ms) utilizado para decrementar los temporizadores.
+
 ---
 
 ## 2. Diagrama de Transición de Estados (Sensor FSM)
@@ -74,18 +78,20 @@ stateDiagram-v2
 
 También realizamos un análisis de los demás sensores:
 
-### 2. Bobina de Entrada y Salida/ Presencia Vehicular (`SEN_COIL_IN/OUT`)
+### 2. Bobina de Presencia Vehicular (`SEN_COIL`)
 
 | Estado Actual | Evento / Entrada | Condición [Guardia] | Estado Siguiente | Acciones Realizadas |
 | :--- | :--- | :--- | :--- | :--- |
-| `ST_COIL_IN_OFF` | `EV_COIL_IN_HIGH` | - | `ST_COIL_IN_RISING` | `DEL_COIL_IN = 20s` |
-| `ST_COIL_IN_RISING` | `tick` | `[DEL_COIL_IN > 0]` | `ST_COIL_IN_RISING` | `DEL_COIL_IN--` |
-| `ST_COIL_IN_RISING` | `tick` | `[DEL_COIL_IN == 0]` | `ST_COIL_IN_ON` | `raise EV_SYS_CAR_ARRIVED` |
-| `ST_COIL_IN_RISING` | `EV_COIL_IN_LOW` | - | `ST_COIL_IN_OFF` | - |
-| `ST_COIL_IN_ON` | `EV_COIL_IN_LOW` | - | `ST_COIL_IN_FALLING` | `DEL_COIL_IN = DEBOUNCE_TIME` |
-| `ST_COIL_IN_FALLING` | `tick` | `[DEL_COIL_IN > 0]` | `ST_COIL_IN_FALLING` | `DEL_COIL_IN--` |
-| `ST_COIL_IN_FALLING` | `tick` | `[DEL_COIL_IN == 0]` | `ST_COIL_IN_OFF` | `raise EV_SYS_CAR_LEFT_IN` |
-| `ST_COIL_IN_FALLING` | `EV_COIL_IN_HIGH` | - | `ST_COIL_IN_ON` | - |
+| `ST_COIL_OFF` | `EV_COIL_HIGH` | - | `ST_COIL_RISING` | `tick = DEL_COIL_20s` |
+| `ST_COIL_OFF` | `EV_COIL_LOW` | - | - | - |
+| `ST_COIL_RISING` | - | `[tick > 0]` | - | `tick--` |
+| `ST_COIL_RISING` | `EV_COIL_LOW` | `[tick == 0]` | `ST_COIL_OFF` | - |
+| `ST_COIL_RISING` | `EV_COIL_HIGH` | `[tick == 0]` | `ST_COIL_ON` | `raise EV_SYS_CAR_ARRIVED` |
+| `ST_COIL_ON` | `EV_COIL_LOW` | - | `ST_COIL_FALLING` | `tick = DEBOUNCE_TIME` |
+| `ST_COIL_ON` | `EV_COIL_HIGH` | - | - | - |
+| `ST_COIL_FALLING` | - | `[tick > 0]` | - | `tick--` |
+| `ST_COIL_FALLING` | `EV_COIL_LOW` | `[tick == 0]` | `ST_COIL_OFF` | `raise EV_SYS_CAR_PASSED` |
+| `ST_COIL_FALLING` | `EV_COIL_HIGH` | `[tick == 0]` | `ST_COIL_ON` | - |
 
 ---
 

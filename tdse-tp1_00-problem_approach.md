@@ -37,12 +37,13 @@ En el acceso al estacionamiento se encuentra una cámara que lee la patente del 
 
 ## Arquitectura de Software Temporizada (Update by Time, period = 1ms)
 El programa está organizado en módulos independientes que se ejecutan de forma cíclica cada **1 ms**:
+```mermaid
+flowchart LR
+    A["SENSOR<br>(Lectura/Filtro)"] --> B["SYSTEM<br>(Lógica/Estados)"] --> C["ACTUATOR<br>(Salidas/Control)"]
 
-``` text
-┌──────────────────┐      ┌──────────────────┐      ┌──────────────────┐
-│      SENSOR      │───>  │      SYSTEM      │───>  │     ACTUATOR     │
-│ (Lectura/Filtro) │      │ (Lógica/Estados) │      │ (Salidas/Control)│
-└──────────────────┘      └──────────────────┘      └──────────────────┘
+    style A fill:#85e3a0,stroke:#2e7d32,stroke-width:2px,color:#000
+    style B fill:#80d8ff,stroke:#0277bd,stroke-width:2px,color:#000
+    style C fill:#f8bbd0,stroke:#c2185b,stroke-width:2px,color:#000
 ```
 
 1. **`Sensor` (Escrutar):** 
