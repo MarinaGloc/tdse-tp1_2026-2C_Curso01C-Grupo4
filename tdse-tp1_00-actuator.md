@@ -36,6 +36,7 @@ Garantiza la independencia del hardware mediante máquinas de estado locales que
 ### Temporizadores Internos (`uint32_t`)
 * `DEL_BLINK_BARRIER`: Contador para controlar el medio período de destello del LED de barrera.
 * `DEL_COMM_PULSE`: Contador para el pulso de transmisión del LED de servidor.
+* `tick`: Evento de reloj del sistema (1ms) utilizado para decrementar los temporizadores.
 
 ---
 ## 4. Diagrama de Transición de Estados (Sensor FSM)
